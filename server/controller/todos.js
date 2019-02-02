@@ -1,3 +1,5 @@
+const todos = require('../model/todos')
+
 const wait = async (s) => {
   return new Promise(res => {
     setTimeout(() => res(), s*1000);
@@ -6,30 +8,35 @@ const wait = async (s) => {
 
 module.exports = {
   async get(ctx) {
-    await wait(1);
+    await wait(1)
+    let params = ctx.request.query
+    let todosModel = new todos(params)
+    todosModel.insertOne({
+      
+    })
     ctx.body = {
-      test: 'test',
+      test: 'get',
     }
   },
 
-  async add(ctx) {
-    await wait(1);
+  async add(ctx) {c
+    await wait(1)
     ctx.body = {
-      test: 'test',
+      test: 'add',
     }
   },
 
   async delete(ctx) {
-    await wait(1);
+    await wait(1)
     ctx.body = {
-      test: 'test',
+      test: 'delete',
     }
   },
 
   async modify(ctx) {
-    await wait(1);
+    await wait(1)
     ctx.body = {
-      test: 'test',
+      test: 'modify',
     }
   }
 }
