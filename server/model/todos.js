@@ -6,7 +6,7 @@ const todoSchema = new Mongoose.Schema({
   },
   date: {
     type: Date,
-    default: new Date(),
+    default: Date.now(),
   },
   completed: {
     type: Boolean,
@@ -16,6 +16,10 @@ const todoSchema = new Mongoose.Schema({
     type: String,
     default: '',
   },
+  author: {
+    type: Mongoose.Schema.Types.ObjectId,
+    ref: 'Users',
+  }
 })
 
 module.exports = Mongoose.model('Todos', todoSchema)

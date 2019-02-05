@@ -10,58 +10,89 @@ module.exports = {
 
   async get(ctx) {
     await wait(1)
-    await todos.find({}, function(err, res) {
+    try {
+      await todos.find({}, function(err, res) {
+        ctx.body = {
+          status: err ? 'Error' : 'OK',
+          result: err ? err : res.map(row => ({
+            id: row._id,
+            date: row.date,
+            completed: row.completed,
+            title: row.title,
+          })),
+        }
+      })
+    } catch(err) {
       ctx.body = {
-        status: err ? 'Error' : 'OK',
-        result: err ? err : res.map(row => ({
-          id: row._id,
-          date: row.date,
-          completed: row.completed,
-          title: row.title,
-        }))
+        status: 'Error',
+        result: err,
       }
-    })
+    }
   },
 
   async add(ctx) {
     await wait(1)
     let requestBody = ctx.request.body
     let todosModel = new todos(requestBody)
-    await new Promise(resolve => todosModel.save(function(err, res) {
+    try {
+      await new Promise(resolve => todosModel.save(function(err, res) {
+        ctx.body = {
+          status: err ? 'Error' : 'OK',
+          result: err ? err : res,
+        }
+        resolve()
+      }))
+    } catch(err) {
       ctx.body = {
-        status: err ? 'Error' : 'OK',
-        result: err ? err : res
+        status: 'Error',
+        result: err,
       }
-      resolve()
-    }))
+    }
   },
 
   async delete(ctx) {
     await wait(1)
-    let requestBody = ctx.request.body
-    let todosModel = new todos(requestBody)
-    await todos.findByIdAndDelete(todosModel.id, function(err, res) {
+    let requestParams = ctx.request.query
+    try {
+      await todos.findByIdAndDelete(requestParams.id, function(err, res) {
+        ctx.body = {
+          status: err ? 'Error' : 'OK',
+          result: err ? err : {
+            id: res._id,
+          },
+        }
+      })
+    } catch(err) {
       ctx.body = {
-        status: err ? 'Error' : 'OK',
-        result: err ? err : res
+        status: 'Error',
+        result: err,
       }
-    })
+    }
   },
 
   async modify(ctx) {
     await wait(1)
-    let params = ctx.request.body
-    let todosModel = new todos(params)
-    await todos.findByIdAndUpdate(todosModel.id, {
-      date: todosModel.date,
-      completed: todosModel.completed,
-      title: todosModel.title,
-    }, function (err, res) {
+    let requestParams = ctx.request.query
+    let requestBody = ctx.request.body
+    let completed = requestBody.completed || false
+    try {
+      await todos.findByIdAndUpdate(requestParams.id, {
+        completed: completed,
+      }, function (err, res) {
+        ctx.body = {
+          status: err ? 'Error' : 'OK',
+          result: err ? err : {
+            id: res._id,
+            completed: res.completed,
+          },
+        }
+      })
+    } catch(err) {
       ctx.body = {
-        status: err ? 'Error' : 'OK',
-        result: err ? err : res
+        status: 'Error',
+        result: err,
       }
-    })
+    }
   },
 
 }
