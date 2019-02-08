@@ -14,7 +14,7 @@ const todoSchema = new Mongoose.Schema({
   },
   title: {
     type: String,
-    default: '',
+    default: 'None',
   },
   author: {
     type: Mongoose.Schema.Types.ObjectId,

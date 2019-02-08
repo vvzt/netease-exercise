@@ -1,4 +1,4 @@
-const users = require('../model/users')
+const UsersModel = require('../model/users')
 
 const wait = async (s) => {
   return new Promise(res => {
@@ -8,24 +8,26 @@ const wait = async (s) => {
 
 module.exports = {
 
-  async login(ctx) {
+  async register(ctx) {
     await wait(1)
     let id = ctx.request.query.id
-    let userModel = new users({ _id: id })
     try {
-      let findRes = await users.findById(id, function(err, res) {
+      let findRes = await UsersModel.findById(id, function(err, res) {
+        if(err) console.log('ERROR: ' + err)
         ctx.body = {
-          status: err ? 'Error' : 'OK',
-          result: err ? err : {
+          status: 'OK',
+          result: {
             id
           },
         }
       })
       if(findRes === null) {
+        let userModel = new UsersModel({ _id: id })
         await new Promise(resolve => userModel.save(function(err, res) {
+          if(err) console.log('ERROR: ' + err)
           ctx.body = {
-            status: err ? 'Error' : 'OK',
-            result: err ? err : {
+            status: 'OK',
+            result: {
               id: res._id
             },
           }
@@ -33,9 +35,10 @@ module.exports = {
         }))
       }
     } catch(err) {
+      ctx.status = 500
       ctx.body = {
         status: 'Error',
-        result: err,
+        // result: err,
       }
     }
   },

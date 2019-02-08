@@ -1,4 +1,5 @@
-const todos = require('../model/todos')
+const TodosModel = require('../model/todos')
+const UsersModel = require('../model/users')
 
 const wait = async (s) => {
   return new Promise(res => {
@@ -10,11 +11,13 @@ module.exports = {
 
   async get(ctx) {
     await wait(1)
+    let userId = ctx.params.userId
     try {
-      await todos.find({}, function(err, res) {
-        ctx.body = {
-          status: err ? 'Error' : 'OK',
-          result: err ? err : res.map(row => ({
+      await TodosModel.find({ author: userId }, null, { sort: { 'date': -1 } }, function(err, res) {
+        if(err) console.log('ERROR: ' + err)
+        else ctx.body = {
+          status: 'OK',
+          result: res.map(row => ({
             id: row._id,
             date: row.date,
             completed: row.completed,
@@ -23,74 +26,85 @@ module.exports = {
         }
       })
     } catch(err) {
+      ctx.status = 500
       ctx.body = {
         status: 'Error',
-        result: err,
+        // result: err,
       }
     }
   },
 
   async add(ctx) {
-    await wait(1)
+    await wait(0.5)
+    let userId = ctx.params.userId
     let requestBody = ctx.request.body
-    let todosModel = new todos(requestBody)
-    try {
-      await new Promise(resolve => todosModel.save(function(err, res) {
-        ctx.body = {
-          status: err ? 'Error' : 'OK',
-          result: err ? err : res,
-        }
-        resolve()
-      }))
+    let todosModel = new TodosModel({
+      ...requestBody,
+      author: new UsersModel({ _id: userId })
+    })
+    try {  
+      await todosModel.save().then(res => {
+        ctx.body = { status: 'OK' }
+      })
     } catch(err) {
+      ctx.status = 500
       ctx.body = {
         status: 'Error',
-        result: err,
+        // result: err,
       }
     }
   },
 
-  async delete(ctx) {
+  async del(ctx) {
     await wait(1)
-    let requestParams = ctx.request.query
+    let requestParams = ctx.params
     try {
-      await todos.findByIdAndDelete(requestParams.id, function(err, res) {
-        ctx.body = {
-          status: err ? 'Error' : 'OK',
-          result: err ? err : {
-            id: res._id,
-          },
+      await TodosModel.findByIdAndDelete(requestParams.id, function(err, res) {
+        if(err) console.log('ERROR: ' + err)
+        else if(res === null) {
+          ctx.status = 404
+        } else {
+          ctx.body = {
+            status: 'OK'
+          }
         }
       })
     } catch(err) {
+      ctx.status = 500
       ctx.body = {
         status: 'Error',
-        result: err,
+        // result: err,
       }
     }
   },
 
   async modify(ctx) {
     await wait(1)
-    let requestParams = ctx.request.query
+    let requestParams = ctx.params
     let requestBody = ctx.request.body
     let completed = requestBody.completed || false
     try {
-      await todos.findByIdAndUpdate(requestParams.id, {
+      await TodosModel.findByIdAndUpdate(requestParams.id, {
         completed: completed,
       }, function (err, res) {
-        ctx.body = {
-          status: err ? 'Error' : 'OK',
-          result: err ? err : {
-            id: res._id,
-            completed: res.completed,
-          },
+        if(err) console.log('ERROR: ' + err)
+        else if(res === null) {
+          ctx.status = 404
+        } else {
+          ctx.body = {
+            status: 'OK',
+            result: {
+              id: res._id,
+              completed: completed,
+            },
+          }
         }
       })
     } catch(err) {
+      ctx.status = 500
       ctx.body = {
         status: 'Error',
-        result: err,
+        // result: err,
       }
     }
   },
