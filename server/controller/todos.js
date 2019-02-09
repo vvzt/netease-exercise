@@ -13,6 +13,7 @@ module.exports = {
     await wait(1)
     let userId = ctx.params.userId
     try {
+      // 查找 userId 的所有 todos 并以时间倒序排序
       await TodosModel.find({ author: userId }, null, { sort: { 'date': -1 } }, function(err, res) {
         if(err) console.log('ERROR: ' + err)
         else ctx.body = {
@@ -35,7 +36,7 @@ module.exports = {
   },
 
   async add(ctx) {
-    await wait(0.5)
+    await wait(1)
     let userId = ctx.params.userId
     let requestBody = ctx.request.body
     let todosModel = new TodosModel({

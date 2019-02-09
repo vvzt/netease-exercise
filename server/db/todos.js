@@ -1,11 +1,11 @@
 const Mongoose = require('mongoose')
-const PATH = 'mongodb://localhost:27017/todos'
+const DB_PATH = 'mongodb://localhost:27017/todos'
 
-Mongoose.connect(PATH, { useNewUrlParser: true }, function(err) {
+Mongoose.connect(DB_PATH, { useNewUrlParser: true }, function(err) {
   if(err) {
-    console.log('Mongo connection failed')
+    console.log(`MongoDB connect failed > ${DB_PATH}`)
   } else {
-    console.log('Mongo connection OK')
+    console.log(`MongoDB connected > ${DB_PATH}`)
   }
 })
 

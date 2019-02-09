@@ -12,27 +12,46 @@ module.exports = {
     await wait(1)
     let id = ctx.request.query.id
     try {
-      let findRes = await UsersModel.findById(id, function(err, res) {
-        if(err) console.log('ERROR: ' + err)
-        ctx.body = {
-          status: 'OK',
-          result: {
-            id
-          },
-        }
-      })
+      let findRes
+      if(id) {
+        // 有 query id 时查询用户是否存在
+        await UsersModel.findById(id, function(err, res) {
+          if(err) {
+            findRes = err
+            console.log('ERROR: ' + err)
+          }
+          else if(!res) {
+            findRes = 404
+            ctx.body = {
+              status: 'Error',
+              result: {
+                message: 'Invalid user id',
+              },
+            }
+          } else {
+            findRes = res
+            ctx.body = {
+              status: 'OK',
+              result: {
+                id,
+              },
+            }
+          }
+        })
+      } else {
+        findRes = null
+      }
       if(findRes === null) {
+        // 未查询到用户时直接注册
         let userModel = new UsersModel({ _id: id })
-        await new Promise(resolve => userModel.save(function(err, res) {
-          if(err) console.log('ERROR: ' + err)
+        await userModel.save().then(res => {
           ctx.body = {
             status: 'OK',
             result: {
-              id: res._id
+              id: res._id,
             },
           }
-          resolve()
-        }))
+        })
       }
     } catch(err) {
       ctx.status = 500
