@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <!-- @STYLE -->
+  <link rel="stylesheet" href="../css/normalize.css" type="text/css">
+</head>
+<body>
+  <div id="app"></div>
+
+  <script src="../javascript/lib/nej/define.js"></script>
+  <script>
+    NEJ.define([
+      'util/dispatcher/dispatcher'
+    ], function(_dispatcher) {
+      _dispatcher._$startup({
+        rules: {
+          rewrite: {
+            '404': '/todo',
+            '/': '/todo',
+          },
+          title: {
+            '/': 'Index',
+            '/todo': 'To Do List'
+          },
+          alias: {
+            'layout-app': '/todo',
+          }
+        },
+        modules: {
+          '/?/list': 'module/m-layout/index.html',
+
+          '/todo': {
+            module: 'module/m-layout/index.html',
+            composite: {
+              list: '/?/list'
+            }
+          }
+        },
+        onbeforechange: function (_event) {
+          console.log(_event)
+        }
+      })
+    })
+  </script>
+
+</body>
+</html>
