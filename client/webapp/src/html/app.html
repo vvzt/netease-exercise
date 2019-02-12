@@ -19,29 +19,32 @@
       _dispatcher._$startup({
         rules: {
           rewrite: {
-            '404': '/todo',
-            '/': '/todo',
+            '404': '/todo/list',
+            '/todo': '/todo/list'
           },
           title: {
-            '/': 'Index',
-            '/todo': 'To Do List'
+            '/todo': 'To Do',
+            '/todo/list': 'To Do List',
           },
           alias: {
             'layout-app': '/todo',
+            'layout-banner': '/?/banner',
+            'todo-list': '/todo/list',
           }
         },
         modules: {
-          '/?/list': 'module/m-layout/index.html',
+          '/?/banner': 'module/m-banner/index.html',
 
           '/todo': {
             module: 'module/m-layout/index.html',
             composite: {
-              list: '/?/list'
+              banner: '/?/banner',
             }
-          }
+          },
+          '/todo/list': 'module/m-list/index.html',
         },
         onbeforechange: function (_event) {
-          console.log(_event)
+          console.log('onbeforechange ', _event)
         }
       })
     })

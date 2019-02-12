@@ -10,14 +10,8 @@ NEJ.define([
    * @param  {Object}
    * @return {Object}
    */
-  _p._$$ModuleLayoutApp = _klass._$klass()
-  var _pro = _p._$$ModuleLayoutApp._$extend(_module._$$ModuleAbstract)
-
-  // https://github.com/NEYouFan/nej-framework/blob/master/doc/DISPATCHER.md#%E6%A8%A1%E5%9D%97%E7%BB%84%E5%90%88-1
-  _pro.__doParseParent = function(_options) {
-    console.log('__doParseParent: ', _options)
-    return _element._$get('app')
-  }
+  _p._$$ModuleBanner = _klass._$klass()
+  var _pro = _p._$$ModuleBanner._$extend(_module._$$ModuleAbstract)
   
   /**
    * 构建模块，主要处理以下业务逻辑
@@ -28,15 +22,7 @@ NEJ.define([
    */
   _pro.__doBuild = function() {
     this.__super()
-    var _containerTemplate = _tpl._$getTextTemplate('m-container')
-    this.__body = _element._$html2node(_containerTemplate)
-
-    var _banner = _element._$getByClassName(this.__body, 'm-banner')[0]
-    var _todo = _element._$getByClassName(this.__body, 'm-todo')[0]
-    this.__export = {
-      banner: _banner,
-      parent: _todo,
-    }
+    this.__body = _element._$html2node(_tpl._$getTextTemplate('m-banner'))
   }
 
   /**
@@ -48,7 +34,6 @@ NEJ.define([
    * @return {Void}
    */
   _pro.__onShow = function(_options) {
-    console.log('onShow args = ', arguments)
     this.__super(_options)
   }
 
@@ -76,6 +61,6 @@ NEJ.define([
     // TODO
   }
   
-  _module._$regist('layout-app', _p._$$ModuleLayoutApp)
+  _module._$regist('layout-banner', _p._$$ModuleBanner)
   return _p
 })
