@@ -1,0 +1,18 @@
+.section {
+  float: left;
+  width: 100%;
+  justify-content: space-around;
+}
+
+.wrapper {
+  display: flex;
+  clear: both;
+}
+
+.z-item-completed-ok {
+  text-decoration: line-through
+}
+
+.z-item-completed-no {
+  
+}
