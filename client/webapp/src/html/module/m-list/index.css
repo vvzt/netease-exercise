@@ -1,7 +1,5 @@
 .section {
-  float: left;
   width: 100%;
-  justify-content: space-around;
 }
 
 .wrapper {
@@ -9,10 +7,38 @@
   clear: both;
 }
 
+.g-list-index, .g-list-title {
+  transform: all .5s;
+}
+
+.g-list-index {
+  width: 40px;
+  height: 40px;
+  padding: 5px 15px;
+  background-position: 50% 50%;
+  background-size: 30px 30px;
+  background-repeat: no-repeat;
+}
+
+.g-list-title {
+  font-size: 20px;
+  line-height: 50px;
+  text-indent: 5px;
+}
+
 .z-item-completed-ok {
-  text-decoration: line-through
+  color: #D9D9D9;
+  text-decoration: line-through; 
 }
 
 .z-item-completed-no {
   
+}
+
+.z-index-completed-ok {
+  background-image: url('../../res/todo_list.png');
+}
+
+.z-index-completed-no {
+  background-image: url('../../res/todo_list_completed.png');
 }

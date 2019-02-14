@@ -4,6 +4,12 @@ NEJ.define([
   'util/dispatcher/module',
   'util/template/tpl',
 ], function(_klass, _element, _module, _tpl, _p) {
+  /* 
+    构建 - __doBuild：构建模块结构，缓存模块需要使用的节点，初始化组合控件的配置参数
+    显示 - __onShow：将模块放置到指定的容器中，分配组合控件，添加相关事件，执行__onRefresh的业务逻辑
+    刷新 - __onRefresh：根据外界输入的参数信息获取数据并展示（这里主要做数据处理）
+    隐藏 - __onHide：模块放至内存中，回收在__onShow中分配的组合控件和添加的事件，回收__onRefresh中产生的视图（这里尽量保证执行完成后恢复到__doBuild后的状态）
+  */
   /**
    * @class  {_$$ModuleLayoutSystem}
    * @extend {_$$ModuleAbstract}

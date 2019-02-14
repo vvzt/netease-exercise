@@ -46,9 +46,10 @@ NEJ.define([
   // 刷新
   _pro.__doRefresh = function(_data){
     this.__data = _data
-    this.__nindex.id = this.__nindex.innerHTML = _data.id
+    this.__nindex.id = _data.id
     this.__ntitle.innerHTML = _data.title
     
+    _element._$addClassName(this.__nindex, 'z-index-completed-' + (_data.isCompleted ? 'ok' : 'no'))
     _element._$addClassName(this.__ntitle, 'z-item-completed-' + (_data.isCompleted ? 'ok' : 'no'))
     // // 子评论列表
     // if (!!_data.replies){
@@ -72,13 +73,23 @@ NEJ.define([
         console.log('click fn:', this.__data)
         // 通过完成的状态切换 class
         var _nextStatus = !this.__data.isCompleted
-        var _completedClassArray = ['z-item-completed-ok', 'z-item-completed-no']
-        _element._$replaceClassName(this.__ntitle, ...(_nextStatus ? _completedClassArray.reverse() : _completedClassArray))
+        
+        this._$setCompleted(_nextStatus)
         
         this.__data.isCompleted = _nextStatus
 
         break
       }
+    }
+  }
+
+  _pro._$setCompleted = function(_nextStatus) {
+    if(_nextStatus) {
+      _element._$replaceClassName(this.__nindex,'z-index-completed-no', 'z-index-completed-ok')
+      _element._$replaceClassName(this.__ntitle,'z-item-completed-no', 'z-item-completed-ok')
+    } else {
+      _element._$replaceClassName(this.__nindex, 'z-index-completed-ok', 'z-index-completed-no')
+      _element._$replaceClassName(this.__ntitle, 'z-item-completed-ok', 'z-item-completed-no')
     }
   }
 
