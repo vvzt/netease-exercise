@@ -6,13 +6,14 @@ NEJ.define([
   'util/dispatcher/module',
   'util/template/tpl',
   'util/template/jst',
+  'util/cache/storage',
   'ui/item/list',
   'text!./index.html',
   'text!./index.css'
-], function($, _klass, _element, _event, _module, _tpl, _jst, _list, _html, _css, _p) {
+], function($, _klass, _element, _event, _module, _tpl, _jst, _storage, _list, _html, _css, _p) {
 
-  _p._$$ModuleList = _klass._$klass()
-  var _pro = _p._$$ModuleList._$extend(_list._$$ListItem)
+  _p._$$ModuleItem = _klass._$klass()
+  var _pro = _p._$$ModuleItem._$extend(_list._$$ListItem)
 
   // 初始化外观
   // 此过程只会在控件第一次创建时进入
@@ -29,17 +30,24 @@ NEJ.define([
   // 此过程只会在控件第一次创建时进入
   _pro.__initNode = function(){
     this.__super()
-    // 0 - 头像图片节点
-    // 1 - 用户名节点
-    // 2 - 内容节点
-    var _list = _element._$getByClassName(this.__body, 'section')
-    this.__nindex = _list[0]
-    this.__ntitle = _list[1]
+    // 0 - 完成按钮
+    // 1 - todo内容
+    // 2 - 修改&删除
+    var _els = _element._$getByClassName(this.__body, 'section')
+    var _btns = _element._$getChildren(_els[2])
+    this.__nindex = _els[0]
+    this.__ntitle = _els[1]
+    this.__ndel = _btns[0]
     // 事件
     _event._$addEvent(
-        _list[0],
-        'click',
-        this.__onAction._$bind(this)
+      _els[0],
+      'click',
+      this.__onAction._$bind(this)
+    )
+    _event._$addEvent(
+      _btns[0], // delete
+      'click',
+      this.__onAction._$bind(this)
     )
   }
 
@@ -68,17 +76,28 @@ NEJ.define([
   _pro.__onAction = function(_actionEvent){
     var _node = _event._$getElement(_actionEvent)
     if (!_node) return
-    switch(_actionEvent.type) {
-      case 'click': {
-        console.log('click fn:', this.__data)
-        // 通过完成的状态切换 class
-        var _nextStatus = !this.__data.isCompleted
-        
-        this._$setCompleted(_nextStatus)
-        
-        this.__data.isCompleted = _nextStatus
-
-        break
+    if(_actionEvent.type === 'click') {
+      switch(_node) {
+        case this.__nindex: {
+          console.log('click fn:', this.__data)
+          // 通过完成的状态切换 class
+          var _nextStatus = !this.__data.isCompleted
+          
+          this._$setCompleted(_nextStatus)
+          this.__data.isCompleted = _nextStatus
+          break
+        }
+        case this.__nedit: {
+          // 编辑
+          
+          console.log('edit')
+          break
+        }
+        case this.__ndel: {
+          // 删除
+          this.__destroy()
+          break
+        }
       }
     }
   }

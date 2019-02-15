@@ -1,0 +1,69 @@
+
+.g-item-index, .u-item-action-del, .u-item-action-edit {
+  outline: none;
+  cursor:pointer;
+  background-position: 50% 50%;
+  background-size: 18px 18px;
+  background-repeat: no-repeat;
+  background-color: transparent;
+}
+
+.section {
+  width: 100%;
+}
+
+.g-item-wrapper {
+  display: flex;
+  clear: both;
+  padding: 0 20px;
+  border-bottom: 1px solid rgba(166, 166, 166, 0.1);
+}
+.g-item-wrapper:last-child {
+  border-bottom: none;
+}
+
+.g-item-index {
+  width: 40px;
+  height: 50px;
+  padding: 5px 15px;
+  background-position: 50% 50%;
+  background-size: 30px 30px;
+  background-repeat: no-repeat;
+}
+
+.g-item-title {
+  font-size: 20px;
+  line-height: 60px;
+  transition: all .2s
+}
+
+.g-item-action-btns {
+  display: flex;
+  align-items: center;
+  max-width: 60px;
+}
+
+.u-item-action-del {
+  box-sizing: border-box;
+  flex: 1 0 auto;
+  height: 30px;
+  border: none;
+  background-image: url('../../res/del.png');
+}
+
+.z-item-completed-ok {
+  color: #D9D9D9;
+  text-decoration: line-through; 
+}
+
+.z-item-completed-no {
+  
+}
+
+.z-index-completed-ok {
+  background-image: url('../../res/todo_item_completed.png');
+}
+
+.z-index-completed-no {
+  background-image: url('../../res/todo_item.png');
+}

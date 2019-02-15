@@ -5,14 +5,32 @@ NEJ.define([
   'util/dispatcher/module',
   'util/template/tpl',
   'util/template/jst',
-  '../m-list/index.js'
-], function(_klass, _element, _event, _module, _tpl, _jst, _mlist, _p) {
+  'util/cache/storage',
+  '../m-item/index.js'
+], function(_klass, _element, _event, _module, _tpl, _jst, _storage, _mlist, _p) {
   
   _p._$$ModuleList = _klass._$klass()
   var _pro = _p._$$ModuleList._$extend(_module._$$ModuleAbstract)
   
   _pro.__doBuild = function() {
     this.__body = _element._$html2node(_tpl._$getTextTemplate('m-todo'))
+
+    this.__todoStorage = _storage._$getDataInStorageWithDefault('todos', {})
+
+
+    var _todoList = _tpl._$getItemTemplate(
+      [
+        { id: 'asfasf', title: 'true', isCompleted: true },
+        { id: 'asjdiaw', title: 'false', isCompleted: false }
+      ],
+      _mlist._$$ModuleItem,
+      {
+        parent: 'm-list',
+        onchangestatus: function(_data) {},
+        ondelete: function(_data) {},
+      }
+    )
+    this.__list = _todoList
 
     // var _templateSeed = _jst._$add('m-list-template')
 
@@ -25,20 +43,6 @@ NEJ.define([
     //   clazz: 'ttt'
     // })
 
-    var _todoList = _tpl._$getItemTemplate(
-      [
-        { id: 'asfasf', title: 'true', isCompleted: true },
-        { id: 'asjdiaw', title: 'false', isCompleted: false }
-      ],
-      _mlist._$$ModuleList,
-      {
-        parent: 'm-list',
-        onchangestatus: function(_data) {},
-        ondelete: function(_data) {},
-      }
-    )
-    this.__list = _todoList
-    console.log('_todoList: ', _todoList)
 
     // _jst._$render('m-list', _todoList, {
     //   test: 222
@@ -52,13 +56,35 @@ NEJ.define([
     var that = this
     var el_input = _element._$getByClassName(this.__body, 'u-input')[0]
     _event._$addEvent(el_input, 'enter', function(_actionEvent) {
-      console.log(_actionEvent, 'onenter')
+      var val = this.value
+      this.value = ''
+      that.__events.onrefresh({
+        item: {
+          id: '',
+          title: val
+        }
+      })
       // onenter todo 
     }, false)
   }
 
-  _pro.__onRefresh = function(_options) {
-    this.__super(_options)
+  _pro.__onRefresh = function(_data) {
+    this.__super(_data)
+    console.log(1, 'onrefresh', _data)
+    if(_data.item) {
+      // add
+      _tpl._$getItemTemplate(
+        [
+          _data.item
+        ],
+        _mlist._$$ModuleItem,
+        {
+          parent: 'm-list',
+          onchangestatus: function(_data) {},
+          ondelete: function(_data) {},
+        }
+      )
+    }
   }
 
   _module._$regist('todo-list', _p._$$ModuleList)
