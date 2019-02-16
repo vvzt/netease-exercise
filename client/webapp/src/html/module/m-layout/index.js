@@ -21,7 +21,7 @@ NEJ.define([
 
   // https://github.com/NEYouFan/nej-framework/blob/master/doc/DISPATCHER.md#%E6%A8%A1%E5%9D%97%E7%BB%84%E5%90%88-1
   _pro.__doParseParent = function(_options) {
-    console.log('__doParseParent: ', _options)
+    // console.log('__doParseParent: ', _options)
     return _element._$get('app')
   }
   

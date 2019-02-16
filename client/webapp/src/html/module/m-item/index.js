@@ -42,32 +42,41 @@ NEJ.define([
     _event._$addEvent(
       _els[0],
       'click',
-      this.__onAction._$bind(this)
+      this.__onAction._$bind(this),
+      false,
     )
     _event._$addEvent(
       _btns[0], // delete btn
       'click',
-      this.__onAction._$bind(this)
+      this.__onAction._$bind(this),
+      false,
     )
   }
 
   // 刷新
   _pro.__doRefresh = function(_data){
-    this.__data = _data
-    // this.__nindex.id = _data.id
-    this.__ntitle.innerHTML = _data.title
     
-    // 切换 class
-    _element._$addClassName(this.__nindex, 'z-index-completed-' + (_data.isCompleted ? 'ok' : 'no'))
-    _element._$addClassName(this.__ntitle, 'z-item-completed-' + (_data.isCompleted ? 'ok' : 'no'))
+    this.__data = _data
+    this.__ntitle.innerHTML = _data.title
 
-    // 存入 localstorage
-    _storage._$setDataInStorage('todo' + _data.id, _data)
-    // todos id索引数组
-    this.__todos = _storage._$getDataInStorage('todos')
-    this.__todos.push(_data.id)
-    _storage._$setDataInStorage('todos', this.__todos)
-    console.log(777)
+    if(_data.completed) {
+      _element._$replaceClassName(this.__nindex, 'z-index-completed-no', 'z-index-completed-ok')
+      _element._$replaceClassName(this.__ntitle, 'z-item-completed-no', 'z-item-completed-ok')
+    } else {
+      _element._$replaceClassName(this.__nindex, 'z-index-completed-ok', 'z-index-completed-no')
+      _element._$replaceClassName(this.__ntitle, 'z-item-completed-ok', 'z-item-completed-no')
+    }
+
+    var dataInStorage = _storage._$getDataInStorage('todo-' + _data.id)
+    if(!dataInStorage) {
+      // 存入 localstorage
+      _storage._$setDataInStorage('todo-' + _data.id, _data)
+      // todos 更新
+      var todos = _storage._$getDataInStorage('todos')
+      todos.push(_data.id)
+      _storage._$setDataInStorage('todos', todos)
+    }
+    
   }
 
   // 操作
@@ -78,35 +87,27 @@ NEJ.define([
       switch(_node) {
         case this.__nindex: {
           // 通过完成的状态切换 class
-          var _nextStatus = !this.__data.isCompleted
+          var _nextStatus = !this.__data.completed
           
-          this._$setCompleted(_nextStatus)
-          this.__data.isCompleted = _nextStatus
+          this.__data.completed = _nextStatus
+          this._setCompleted(this.__data, _nextStatus)
           break
         }
         case this.__ndel: {
           // del
           var _id = this.__data.id
 
-          // 更新 localstorage todos
-          var _idIndex
-          this.__todos.forEach(function(id, i) {
-            if(id === _id) _idIndex = i
-          })
-          console.log(_idIndex, this.__todos[_idIndex])
-          if(_idIndex > -1) this.__todos.splice(_idIndex, 1)
-          _storage._$delDataInStorage('todo' + _id)
-          _storage._$setDataInStorage('todos', this.__todos)
-          console.log('todo del', _idIndex, this.__data.title)
-
-          this.__destroy()
+          this._delTodoItem(_id)
+          this._$dispatchEvent('onaftercycle', this);
+          
+          this._$recycle()
           break
         }
       }
     }
   }
 
-  _pro._$setCompleted = function(_nextStatus) {
+  _pro._setCompleted = function(_todoItem, _nextStatus) {
     if(_nextStatus) {
       _element._$replaceClassName(this.__nindex, 'z-index-completed-no', 'z-index-completed-ok')
       _element._$replaceClassName(this.__ntitle, 'z-item-completed-no', 'z-item-completed-ok')
@@ -114,6 +115,24 @@ NEJ.define([
       _element._$replaceClassName(this.__nindex, 'z-index-completed-ok', 'z-index-completed-no')
       _element._$replaceClassName(this.__ntitle, 'z-item-completed-ok', 'z-item-completed-no')
     }
+    _storage._$setDataInStorage('todo-' + _todoItem.id, _todoItem)
+  }
+
+  _pro._delTodoItem = function(_id) {
+    var _idIndex
+    var todos = _storage._$getDataInStorage('todos')
+    // 更新 localstorage todos
+    todos.forEach(function(id, i) {
+      if(id === _id) _idIndex = i
+    })
+    if(_idIndex > -1) todos.splice(_idIndex, 1)
+    _storage._$delDataInStorage('todo-' + _id)
+    _storage._$setDataInStorage('todos', todos)
+  }
+
+  _pro._$updateTodoItem = function(_data) {
+    _storage._$setDataInStorage('todo-' + _data.id, _data)
+    this.__doRefresh(_data)
   }
 
   return _p
