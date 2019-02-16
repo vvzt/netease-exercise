@@ -26,9 +26,7 @@
   width: 40px;
   height: 50px;
   padding: 5px 15px;
-  background-position: 50% 50%;
   background-size: 32px 32px;
-  background-repeat: no-repeat;
 }
 
 .g-item-title {
@@ -57,9 +55,9 @@
   text-decoration: line-through; 
 }
 
-.z-item-completed-no {
+/* .z-item-completed-no {
   
-}
+} */
 
 .z-index-completed-ok {
   background-image: url('../../res/todo_item_completed.png');

@@ -8,6 +8,7 @@ NEJ.define([
   'util/cache/storage',
   '../m-item/index.js'
 ], function(_klass, _element, _event, _module, _tpl, _jst, _storage, _mlist, _p) {
+  var itemDeleteFn
 
   _p._$$ModuleList = _klass._$klass()
   var _pro = _p._$$ModuleList._$extend(_module._$$ModuleAbstract)
@@ -24,18 +25,20 @@ NEJ.define([
     // console.log(_todosInStorage)
 
     var that = this
+    itemDeleteFn = function(_item) {
+      var _itemIndex
+      that.__list.forEach(function(item, i) {
+        if(item === _item) _itemIndex = i
+      })
+      if(_itemIndex > -1) that.__list.splice(_itemIndex, 1)
+      console.log(_itemIndex)
+    }
     var _todoList = _tpl._$getItemTemplate(
       _todosArr,
       _mlist._$$ModuleItem,
       {
         parent: 'm-list',
-        onaftercycle: function(_item) {
-          var _itemIndex
-          that.__list.forEach(function(item, i) {
-            if(item === _item) _itemIndex = i
-          })
-          if(_itemIndex > -1) that.__list.splice(_itemIndex, 1)
-        }
+        onaftercycle: itemDeleteFn
       }
     )
     this.__list = _todoList
@@ -93,8 +96,7 @@ NEJ.define([
         _mlist._$$ModuleItem,
         {
           parent: 'm-list',
-          onchangestatus: function(_data) {},
-          ondelete: function(_data) {},
+          onaftercycle: itemDeleteFn,
         }
       )[0])
     }
