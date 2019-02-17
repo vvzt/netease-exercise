@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Document</title>
+  <link rel="icon" href="../../res/img/all.png">
   <link rel="stylesheet" href="../css/app.css">
   <!-- @STYLE -->
   <link rel="stylesheet" href="../css/normalize.css">
@@ -12,6 +13,7 @@
 <body>
   <div id="app"></div>
 
+  <!-- @SCRIPT -->
   <script src="../javascript/lib/nej/define.js"></script>
   <script>
     NEJ.define([
@@ -44,9 +46,6 @@
           },
           '/todo/list': 'module/m-todo/index.html',
         },
-        onbeforechange: function (_event) {
-          console.log('onbeforechange ', _event)
-        }
       })
     })
   </script>

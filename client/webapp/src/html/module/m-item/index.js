@@ -28,7 +28,7 @@ NEJ.define([
 
   // 初始化结构
   // 此过程只会在控件第一次创建时进入
-  _pro.__initNode = function(){
+  _pro.__initNode = function() {
     this.__super()
     // 0 - 完成按钮
     // 1 - todo内容
@@ -43,29 +43,23 @@ NEJ.define([
       _els[0],
       'click',
       this.__onAction._$bind(this),
-      false,
+      false
     )
     _event._$addEvent(
       _btns[0], // delete btn
       'click',
       this.__onAction._$bind(this),
-      false,
+      false
     )
   }
 
   // 刷新
-  _pro.__doRefresh = function(_data){
+  _pro.__doRefresh = function(_data) {
     
     this.__data = _data
     this.__ntitle.innerHTML = _data.title
 
-    if(_data.completed) {
-      _element._$replaceClassName(this.__nindex, 'z-index-completed-no', 'z-index-completed-ok')
-      _element._$replaceClassName(this.__ntitle, 'z-item-completed-no', 'z-item-completed-ok')
-    } else {
-      _element._$replaceClassName(this.__nindex, 'z-index-completed-ok', 'z-index-completed-no')
-      _element._$replaceClassName(this.__ntitle, 'z-item-completed-ok', 'z-item-completed-no')
-    }
+    this._setCompletedStatus(_data.completed)
 
     var dataInStorage = _storage._$getDataInStorage('todo-' + _data.id)
     if(!dataInStorage) {
@@ -80,26 +74,29 @@ NEJ.define([
   }
 
   // 操作
-  _pro.__onAction = function(_actionEvent){
+  _pro.__onAction = function(_actionEvent) {
     var _node = _event._$getElement(_actionEvent)
     if (!_node) return
     if(_actionEvent.type === 'click') {
       switch(_node) {
         case this.__nindex: {
-          // 通过完成的状态切换 class
+          // complete
           var _nextStatus = !this.__data.completed
-          
           this.__data.completed = _nextStatus
-          this._setCompleted(this.__data, _nextStatus)
+
+          _storage._$setDataInStorage('todo-' + this.__data.id, this.__data)
+
+          this._setCompletedStatus(_nextStatus)
+          this._$dispatchEvent('ontoggle', this)
           break
         }
         case this.__ndel: {
           // del
           var _id = this.__data.id
 
-          this._delTodoItem(_id)
-          this._$dispatchEvent('onaftercycle', this);
-          
+          this._delTodoItemInStorage(_id)
+          this._$dispatchEvent('onaftercycle', this)
+
           this._$recycle()
           break
         }
@@ -107,30 +104,43 @@ NEJ.define([
     }
   }
 
-  _pro._setCompleted = function(_todoItem, _nextStatus) {
-    if(_nextStatus) {
+  _pro._setCompletedStatus = function(_completed) {
+    if(_completed) {
       _element._$replaceClassName(this.__nindex, 'z-index-completed-no', 'z-index-completed-ok')
       _element._$replaceClassName(this.__ntitle, 'z-item-completed-no', 'z-item-completed-ok')
     } else {
       _element._$replaceClassName(this.__nindex, 'z-index-completed-ok', 'z-index-completed-no')
       _element._$replaceClassName(this.__ntitle, 'z-item-completed-ok', 'z-item-completed-no')
     }
-    _storage._$setDataInStorage('todo-' + _todoItem.id, _todoItem)
   }
 
-  _pro._delTodoItem = function(_id) {
+  _pro._delTodoItemInStorage = function(_id) {
+    // 删除 todo item 后更新数据
     var _idIndex
     var todos = _storage._$getDataInStorage('todos')
     // 更新 localstorage todos
-    todos.forEach(function(id, i) {
-      if(id === _id) _idIndex = i
-    })
-    if(_idIndex > -1) todos.splice(_idIndex, 1)
+    
+    // es6
+    // _idIndex = todos.findIndex(id => id === _id)
+
+    // todos.forEach(function(id, i) {
+    //   if(id === _id) _idIndex = i
+    // })
+    // if(_idIndex > -1) todos.splice(_idIndex, 1)
+    
+    for(var i = 0; i < todos.length; i++) {
+      if(todos[i] === _id) {
+        todos.splice(i, 1)
+        break
+      }
+    }
+
     _storage._$delDataInStorage('todo-' + _id)
     _storage._$setDataInStorage('todos', todos)
   }
 
   _pro._$updateTodoItem = function(_data) {
+    // 当 icon 被点击时 (event: ontoggle) 触发
     _storage._$setDataInStorage('todo-' + _data.id, _data)
     this.__doRefresh(_data)
   }

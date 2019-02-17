@@ -47,7 +47,7 @@
   flex: 1 0 auto;
   height: 30px;
   border: none;
-  background-image: url('../../res/del.png');
+  background-image: url(/res/img/del.png);
 }
 
 .z-item-completed-ok {
@@ -60,9 +60,9 @@
 } */
 
 .z-index-completed-ok {
-  background-image: url('../../res/todo_item_completed.png');
+  background-image: url(/res/img/todo_item_completed.png);
 }
 
 .z-index-completed-no {
-  background-image: url('../../res/todo_item.png');
+  background-image: url(/res/img/todo_item.png);
 }

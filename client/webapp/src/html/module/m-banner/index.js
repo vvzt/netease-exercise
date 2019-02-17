@@ -56,7 +56,7 @@ NEJ.define([
    * - 尽量保证恢复到构建时的状态
    * @return {Void}
    */
-  _pro.__onHide = function(){
+  _pro.__onHide = function() {
     this.__super()
     // TODO
   }
