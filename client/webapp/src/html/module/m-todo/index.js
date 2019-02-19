@@ -6,8 +6,10 @@ NEJ.define([
   'util/template/tpl',
   'util/template/jst',
   'util/cache/storage',
-  '../m-item/index.js'
-], function(_klass, _element, _event, _module, _tpl, _jst, _storage, _mlist, _p) {
+  'util/ajax/rest',
+  '../m-item/index.js',
+  '../m-tip/index.js',
+], function(_klass, _element, _event, _module, _tpl, _jst, _storage, _ajax, _mlist, _mtip, _p) {
   var _todoItemConfObj
   var _children // 0 - icon , 1 - title, 2 - [ delbtn ]
 
@@ -15,6 +17,10 @@ NEJ.define([
   var _pro = _p._$$ModuleList._$extend(_module._$$ModuleAbstract)
 
   _pro.__doBuild = function() {
+    
+    // 获取用户 todo 数据 or 注册用户
+    var userId = this._checkUserToken()
+
     this.__isAllCompleted // 全选
     this.__body = _element._$html2node(_tpl._$getTextTemplate('m-todo'))
     _children = this.__body.children
@@ -23,6 +29,13 @@ NEJ.define([
     var _todosInStorage = _storage._$getDataInStorageWithDefault('todos', [])
     var _todosArr = this.__todos = _todosInStorage.map(function(todoId) { return _storage._$getDataInStorage('todo-' + todoId) })
 
+    // tip
+    this.__mtip = _element._$get('m-tip')
+    var _htmlSeed = _jst._$add('template-tip')
+    var _html = _jst._$get('template-tip', { id: userId })
+    this.__mtip.innerHTML = _html
+
+    // todo list
     var that = this
     _todoItemConfObj =  {
       parent: 'm-list',
@@ -89,7 +102,7 @@ NEJ.define([
     })
   }
 
-  _pro.__onRefresh = function(_data) {
+  _pro.__onRefresh = function(_data) {console.log(_data)
     this.__super(_data)
     if(_data.todo) {
       // add
@@ -111,6 +124,33 @@ NEJ.define([
     // 修改 icon 状态
     var isAllCompleted = this.__list.length > 0 && this.__list.every(function(todoItem) { return todoItem.__data.completed })
     this._setIconClass(_children[0], this.__isAllCompleted = isAllCompleted)
+  }
+
+  _pro._checkUserToken = function() {
+    // _event._$addEvent(window, 'resterror', function(_error) {
+    //   console.log(_error)
+    // })
+    var url = window.NEJ_CONF.api + '/users'
+    var userId = _storage._$getDataInStorage('user-id')
+    var requestParam = userId ? { id: userId } : {}
+    _ajax._$request(url, {
+      sync: true,
+      param: requestParam,
+      method: 'get',
+      onload: function(_data) {
+        // 请求正常回调
+        userId = _data.result.id
+        _storage._$setDataInStorage('user-id', userId)
+      },
+      onerror: function(_error) {
+        _element._$get('app').innerHTML = '无法连接到服务器...'
+      },
+      onbeforerequest: function(_event) {
+        // _event.request
+        // _event.headers
+      }
+    })
+    return userId
   }
 
   _module._$regist('todo-list', _p._$$ModuleList)

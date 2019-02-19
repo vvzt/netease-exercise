@@ -17,7 +17,7 @@
   <script src="../javascript/lib/nej/define.js"></script>
   <script>
     window.NEJ_CONF = {
-      api: 'localhost:3000/todos'
+      api: 'http://localhost:3000'
     }
     NEJ.define([
       'util/dispatcher/dispatcher'
@@ -36,15 +36,18 @@
             'layout-app': '/todo',
             'layout-banner': '/?/banner',
             'todo-list': '/todo/list',
+            'todo-tip': '/?/tip',
           }
         },
         modules: {
           '/?/banner': 'module/m-banner/index.html',
+          '/?/tip': 'module/m-tip/index.html',
 
           '/todo': {
             module: 'module/m-layout/index.html',
             composite: {
               banner: '/?/banner',
+              tip: '/?/tip',
             }
           },
           '/todo/list': 'module/m-todo/index.html',
