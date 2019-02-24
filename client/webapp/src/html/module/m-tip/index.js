@@ -26,6 +26,7 @@ NEJ.define([
   _pro.__onRefresh = function(_data) {
     this.__super(_data)
     if(_data.id) {
+      if(!this.__body) this.__body = _element._$html2node(_tpl._$getTextTemplate('m-tip-container'))
       this.__body.innerHTML = _jst._$get('m-tip-template', _data)
     }
   }

@@ -60,17 +60,6 @@ NEJ.define([
     this.__ntitle.innerHTML = _data.title
 
     this._setCompletedStatus(_data.completed)
-
-    var dataInStorage = _storage._$getDataInStorage('todo-' + _data.id)
-    if(!dataInStorage) {
-      // 存入 localstorage
-      _storage._$setDataInStorage('todo-' + _data.id, _data)
-      // todos 更新
-      var todos = _storage._$getDataInStorage('todos')
-      todos.push(_data.id)
-      _storage._$setDataInStorage('todos', todos)
-    }
-    
   }
 
   // 操作
@@ -83,9 +72,6 @@ NEJ.define([
           // complete
           var _nextStatus = !this.__data.completed
           this.__data.completed = _nextStatus
-
-          _storage._$setDataInStorage('todo-' + this.__data.id, this.__data)
-
           this._setCompletedStatus(_nextStatus)
           this._$dispatchEvent('ontoggle', this)
           break
@@ -93,10 +79,7 @@ NEJ.define([
         case this.__ndel: {
           // del
           var _id = this.__data.id
-
-          this._delTodoItemInStorage(_id)
-          this._$dispatchEvent('onaftercycle', this)
-
+          this._$dispatchEvent('onbeforecycle', this)
           this._$recycle()
           break
         }
@@ -141,7 +124,7 @@ NEJ.define([
 
   _pro._$updateTodoItem = function(_data) {
     // 当 icon 被点击时 (event: ontoggle) 触发
-    _storage._$setDataInStorage('todo-' + _data.id, _data)
+    // _storage._$setDataInStorage('todo-' + _data.id, _data)
     this.__doRefresh(_data)
   }
 

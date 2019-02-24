@@ -10,11 +10,11 @@ const wait = async (s) => {
 module.exports = {
 
   async get(ctx) {
-    await wait(1)
+    // await wait(1)
     let userId = ctx.params.userId
     try {
-      // 查找 userId 的所有 todos 并以时间倒序排序
-      await TodosModel.find({ author: userId }, null, { sort: { 'date': -1 } }, function(err, res) {
+      // 查找 userId 的所有 todos 并以时间排序
+      await TodosModel.find({ author: userId }, null, { sort: { 'date': 1 } }, function(err, res) {
         if(err) console.log('ERROR: ' + err)
         else ctx.body = {
           status: 'OK',
@@ -36,16 +36,24 @@ module.exports = {
   },
 
   async add(ctx) {
-    await wait(1)
+    // await wait(1)
     let userId = ctx.params.userId
     let requestBody = ctx.request.body
     let todosModel = new TodosModel({
       ...requestBody,
       author: new UsersModel({ _id: userId })
     })
-    try {  
+    try {
       await todosModel.save().then(res => {
-        ctx.body = { status: 'OK' }
+        ctx.body = {
+          status: 'OK',
+          result: {
+            id: res._id,
+            title: res.title,
+            completed: res.completed,
+            date: res.date,
+          }
+        }
       })
     } catch(err) {
       ctx.status = 500
@@ -57,7 +65,7 @@ module.exports = {
   },
 
   async del(ctx) {
-    await wait(1)
+    // await wait(1)
     let requestParams = ctx.params
     try {
       await TodosModel.findByIdAndDelete(requestParams.id, function(err, res) {
@@ -80,7 +88,7 @@ module.exports = {
   },
 
   async modify(ctx) {
-    await wait(1)
+    // await wait(1)
     let requestParams = ctx.params
     let requestBody = ctx.request.body
     let completed = requestBody.completed || false
@@ -110,4 +118,27 @@ module.exports = {
     }
   },
 
+  async modifyAll(ctx) {
+    // await wait(1)
+    let requestParams = ctx.params
+    let requestBody = ctx.request.body
+    let completed = requestBody.completed || false
+    try {
+      await TodosModel.updateMany({ author: requestParams.userId }, { completed: completed }, function(err, res) {
+        if(err) console.log('ERROR: ' + err)
+        else {
+          ctx.body = {
+            status: 'OK',
+            result: res
+          }
+        }
+      })
+    } catch(err) {
+      ctx.status = 500
+      ctx.body = {
+        status: 'Error',
+        // result: err,
+      }
+    }
+  }
 }

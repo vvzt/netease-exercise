@@ -12,6 +12,8 @@ NEJ.define([
 ], function(_klass, _element, _event, _module, _tpl, _jst, _storage, _ajax, _mlist, _mtip, _p) {
   var _todoItemConfObj
   var _children // 0 - icon , 1 - title, 2 - [ delbtn ]
+  var _userRequestUrl = window.NEJ_CONF.api + '/users'
+  var _userTodoRequestUrl // <SERVER-PATH>/user/:userId/todo
 
   _p._$$ModuleList = _klass._$klass()
   var _pro = _p._$$ModuleList._$extend(_module._$$ModuleAbstract)
@@ -19,77 +21,60 @@ NEJ.define([
   _pro.__doBuild = function() {
     this.__super()
 
-    // 获取用户 todo 数据 or 注册用户
-    var userId = this._checkUserToken()
-
-    this.__isAllCompleted // 全选
+    this.__isAllCompleted = false // 全选
+    this.__data = [] // todo list <item: todo data>
+    this.__list = [] // todo list <item: m-item module>
     this.__body = _element._$html2node(_tpl._$getTextTemplate('m-todo'))
     _children = this.__body.children
 
-    // 读取数据
-    var _todosInStorage = _storage._$getDataInStorageWithDefault('todos', [])
-    var _todosArr = this.__todos = _todosInStorage.map(function(todoId) { return _storage._$getDataInStorage('todo-' + todoId) })
-
-    // todo list
-    var that = this
-    _todoItemConfObj =  {
-      parent: 'm-list',
-      onaftercycle: function(_item) {
-        // 从 that.__list 中移除 todo item
-        // var _itemIndex
-        // that.__list.forEach(function(item, i) {
-        //   if(item === _item) _itemIndex = i
-        // })
-        // if(_itemIndex > -1) that.__list.splice(_itemIndex, 1)
-        for(var i = 0; i < that.__list.length; i++) {
-          if(that.__list[i] === _item) {
-            that.__list.splice(i, 1)
-            break
-          }
-        }
-        that._checkAllCompletedStatus()
-      },
-      ontoggle: function(_item) {
-        that._checkAllCompletedStatus()
-      }
-    }
-    var _todoList = _tpl._$getItemTemplate(_todosArr, _mlist._$$ModuleItem, _todoItemConfObj)
-    this.__list = _todoList
-
-    // icon 的初始状态
-    this._checkAllCompletedStatus()
+    // 获取用户 todo 数据 or 注册用户
+    var self = this
+    self._checkUserToken(function() {
+      self._getUserTodoList(function(data) {
+        self.__data = data
+        self._initTodoList(data)
+      })
+    })
+    
+    // 读取数据 & 初始化 todo list
+    // var _todosInStorage = _storage._$getDataInStorageWithDefault('todos', [])
+    // var _todosArr = this.__todos = _todosInStorage.map(function(todoId) { return _storage._$getDataInStorage('todo-' + todoId) })
+    // var _todosArr = this._getUserTodoList()
+    // this._getUserTodoList(this._initTodoList.bind(this)) 
+    
   }
 
   _pro.__onShow = function(_options) {
     this.__super(_options)
-    var that = this
+    var self = this
     var el_icon = _children[0]
     var el_input =_children[1]
     
     _event._$addEvent(el_input, 'enter', function(_actionEvent) {
       // 新增 todo
       if(this.value.length === 0) return
-      that.__events.onrefresh({
-        todo: {
-          id: Date.now(),
-          title: this.value,
-          completed: false,
-          date: Date.now(),
-        }
+      // 发起 put 请求
+      self._addUserTodoItem(this.value, function(putResult) {
+        self.__events.onrefresh({
+          todo: putResult
+        })
       })
       this.value = ''
     }, false)
 
     _event._$addEvent(el_icon, 'click', function(_actionEvent) {
       // 修改 icon 状态
-      var _isAllCompleted = !that.__isAllCompleted
-      that.__isAllCompleted = _isAllCompleted
+      var _isAllCompleted = !self.__isAllCompleted
+      self.__isAllCompleted = _isAllCompleted
 
       // 修改样式先
-      that._setIconClass(el_icon, _isAllCompleted)
+      self._setIconClass(el_icon, _isAllCompleted)
+
+      // post 批量修改
+      self._modUserTodoItem('', _isAllCompleted)
 
       // 更新 todo item 组件
-      that.__list.forEach(function(item) {
+      self.__list.forEach(function(item) {
         item.__data.completed = _isAllCompleted
         item._$updateTodoItem(item.__data)
       })
@@ -116,45 +101,126 @@ NEJ.define([
   }
 
   _pro._checkAllCompletedStatus = function() {
-    // 修改 icon 状态
+    // 判断 icon 状态并修改
     var isAllCompleted = this.__list.length > 0 && this.__list.every(function(todoItem) { return todoItem.__data.completed })
     this._setIconClass(_children[0], this.__isAllCompleted = isAllCompleted)
   }
 
-  _pro._checkUserToken = function() {
+  _pro._initTodoList = function(todosArr) {
+    // 初始化 todo list
+    var self = this
+    _todoItemConfObj =  {
+      parent: 'm-list',
+      onbeforecycle: function(_item) {
+        // 从 self.__list 中移除 todo item
+
+        // self.__list.splice(self.__list.findIndex(item => item === _item), 1)
+
+        // var _itemIndex
+        // self.__list.forEach(function(item, i) {
+        //   if(item === _item) self.__list.splice(i, 1)
+        // })
+        console.log(_item)
+        self._delUserTodoItem(_item.__id, function() {
+          for(var i = 0; i < self.__list.length; i++) {
+            if(self.__list[i] === _item) {
+              self.__list.splice(i, 1)
+              break
+            }
+          }
+          self._checkAllCompletedStatus()
+        })
+      },
+      ontoggle: function(_item) {
+        self._modUserTodoItem(_item.__id, _item.completed, function() {
+          self._checkAllCompletedStatus()
+        })
+      }
+    }
+    var _todoList = _tpl._$getItemTemplate(todosArr, _mlist._$$ModuleItem, _todoItemConfObj)
+    this.__list = _todoList
+
+    // icon 的初始状态
+    this._checkAllCompletedStatus()
+  }
+
+  _pro._checkUserToken = function(callback) {
     // _event._$addEvent(window, 'resterror', function(_error) {
     //   console.log(_error)
     // })
-    var that = this
-    var url = window.NEJ_CONF.api + '/users'
+    var self = this
     var userId = _storage._$getDataInStorage('user-id')
     var requestParam = userId ? { id: userId } : {}
-    _ajax._$request(url, {
+    _ajax._$request(_userRequestUrl, {
+      // sync: true,
       param: requestParam,
       method: 'get',
       onload: function(_data) {
         // 请求正常回调
         userId = _data.result.id
-        that.__doSendMessage('/?/tip', {
+        _userTodoRequestUrl = _userRequestUrl + '/' + userId + '/todos'
+        self.__doSendMessage('/?/tip', {
           status: 'OK',
           id: userId
         })
         _storage._$setDataInStorage('user-id', userId)
-        // _element._$setStyle(that.__body, 'display', 'block')
+        _element._$setStyle(self.__body, 'visibility', 'visible')
+        callback(_data)
       },
       onerror: function(_error) {
-        that.__doSendMessage('/?/tip', {
+        self.__doSendMessage('/?/tip', {
           status: 'error'
         })
-        // var _html = _jst._$get('template-tip', { id: null })
-        // that.__mtip.innerHTML = _html
       },
-      onbeforerequest: function(_event) {
-        // _event.request
-        // _event.headers
+    })
+  }
+
+
+  // 增删改查
+  _pro._getUserTodoList = function(callback) {
+    _ajax._$request(_userTodoRequestUrl, {
+      method: 'get',
+      onload: function(_data) {
+        if(callback) callback(_data.result)
+      },
+      onerror: function(_error) {
+        console.log(_error)
       }
     })
-    return userId
+  }
+
+  _pro._addUserTodoItem = function(itemTitle, callback) {
+    _ajax._$request(_userTodoRequestUrl, {
+      method: 'put',
+      data: {
+        title: itemTitle,
+        date: Date.now(),
+      },
+      onload: function(_data) {
+        if(callback) callback(_data.result)
+      }
+    })
+  }
+
+  _pro._delUserTodoItem = function(itemId, callback) {
+    _ajax._$request(_userTodoRequestUrl + '/' + itemId, {
+      method: 'delete',
+      onload: function(_data) {
+        if(callback) callback(_data.result)
+      }
+    })
+  }
+
+  _pro._modUserTodoItem = function(itemId, isCompleted, callback) {
+    _ajax._$request(_userTodoRequestUrl + (itemId ? ('/' + itemId) : ''), {
+      method: 'post',
+      data: {
+        completed: isCompleted
+      },
+      onload: function(_data) {
+        if(callback) callback(_data.result)
+      }
+    })
   }
 
   _module._$regist('todo-list', _p._$$ModuleList)

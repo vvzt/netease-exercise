@@ -24,5 +24,6 @@ router.put('/', todos.add)
 router.delete('/:id', todos.del)
 
 router.post('/:id', todos.modify)
+router.post('/', todos.modifyAll)
 
 module.exports = router
