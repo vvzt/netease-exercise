@@ -1,8 +1,14 @@
-<textarea name="jst" id="template-tip">
-  <div class="g-tip">
-    <h3>提示</h3>
-    <p>${id}</p>
-  </div>
+<textarea name="txt" id="m-tip-container">
+  <div id="tip-content" class="g-tip"></div>
+</textarea>
+<textarea name="jst" id="m-tip-template">
+  {if defined("id")}
+    <h4>你的ID：<span>${id}</span></h4>
+    <input id="user-id-copy-btn" type="button" value="${copyed ? '已复制到剪贴板' : '点击这里复制你的个人 todo 链接'}"></input>
+  {else}
+    <h4>认证失败</h4>
+    <p>点击重试</p>
+  {/if}
 </textarea>
 <!-- @TEMPLATE -->
 <textarea name="css" data-src="./index.css"></textarea>

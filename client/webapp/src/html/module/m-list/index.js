@@ -17,7 +17,8 @@ NEJ.define([
   var _pro = _p._$$ModuleList._$extend(_module._$$ModuleAbstract)
 
   _pro.__doBuild = function() {
-    
+    this.__super()
+
     // 获取用户 todo 数据 or 注册用户
     var userId = this._checkUserToken()
 
@@ -28,12 +29,6 @@ NEJ.define([
     // 读取数据
     var _todosInStorage = _storage._$getDataInStorageWithDefault('todos', [])
     var _todosArr = this.__todos = _todosInStorage.map(function(todoId) { return _storage._$getDataInStorage('todo-' + todoId) })
-
-    // tip
-    this.__mtip = _element._$get('m-tip')
-    var _htmlSeed = _jst._$add('template-tip')
-    var _html = _jst._$get('template-tip', { id: userId })
-    this.__mtip.innerHTML = _html
 
     // todo list
     var that = this
@@ -102,7 +97,7 @@ NEJ.define([
     })
   }
 
-  _pro.__onRefresh = function(_data) {console.log(_data)
+  _pro.__onRefresh = function(_data) {
     this.__super(_data)
     if(_data.todo) {
       // add
@@ -130,20 +125,29 @@ NEJ.define([
     // _event._$addEvent(window, 'resterror', function(_error) {
     //   console.log(_error)
     // })
+    var that = this
     var url = window.NEJ_CONF.api + '/users'
     var userId = _storage._$getDataInStorage('user-id')
     var requestParam = userId ? { id: userId } : {}
     _ajax._$request(url, {
-      sync: true,
       param: requestParam,
       method: 'get',
       onload: function(_data) {
         // 请求正常回调
         userId = _data.result.id
+        that.__doSendMessage('/?/tip', {
+          status: 'OK',
+          id: userId
+        })
         _storage._$setDataInStorage('user-id', userId)
+        // _element._$setStyle(that.__body, 'display', 'block')
       },
       onerror: function(_error) {
-        _element._$get('app').innerHTML = '无法连接到服务器...'
+        that.__doSendMessage('/?/tip', {
+          status: 'error'
+        })
+        // var _html = _jst._$get('template-tip', { id: null })
+        // that.__mtip.innerHTML = _html
       },
       onbeforerequest: function(_event) {
         // _event.request

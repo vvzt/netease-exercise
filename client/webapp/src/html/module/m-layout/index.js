@@ -37,9 +37,10 @@ NEJ.define([
     var _containerTemplate = _tpl._$getTextTemplate('m-container')
     this.__body = _element._$html2node(_containerTemplate)
 
-    var children = this.__body.children // 0 - banner, 1 - todo
+    var children = this.__body.children // 0 - banner, 1 - todo, 2 - tip
     this.__export = {
       banner: children[0],
+      tip: children[2],
       parent: children[1],
     }
   }
@@ -53,7 +54,6 @@ NEJ.define([
    * @return {Void}
    */
   _pro.__onShow = function(_options) {
-    console.log('onShow args = ', arguments)
     this.__super(_options)
   }
 

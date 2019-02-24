@@ -61,6 +61,6 @@ NEJ.define([
     // TODO
   }
   
-  _module._$regist('layout-banner', _p._$$ModuleBanner)
+  _module._$regist('todo-banner', _p._$$ModuleBanner)
   return _p
 })
