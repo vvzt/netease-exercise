@@ -3,8 +3,8 @@
 </textarea>
 <textarea name="jst" id="m-tip-template">
   {if defined("id")}
-    <h4>你的ID：<span>${id}</span></h4>
-    <input id="user-id-copy-btn" type="button" value="${copyed ? '已复制到剪贴板' : '点击这里复制你的个人 todo 链接'}"></input>
+    <h4>你的 todo 链接：</h4>
+    <p>${url}</p>
   {else}
     <h4>认证失败</h4>
     <p>点击重试</p>

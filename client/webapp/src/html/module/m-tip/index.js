@@ -16,11 +16,6 @@ NEJ.define([
     this.__body = _element._$html2node(_tpl._$getTextTemplate('m-tip-container'))
     this.__data = { id: null }
     _jst._$add('m-tip-template')
-
-    _clipboard._$copy('user-id-copye-btn', this.__data.id)
-    _event._$addEvent('user-id-copye-btn', 'click', function() {
-      console.log(1)
-    })
   }
 
   _pro.__onRefresh = function(_data) {
@@ -39,7 +34,10 @@ NEJ.define([
     if(_msgEvent.from === '/todo/list') {
       var data = _msgEvent.data
       this.__data.id = data.id
-      this.__events.onrefresh(this.__data)
+      this.__events.onrefresh({
+        id: data.id,
+        url: window.location.href + '?id=' + data.id
+      })
     }
     console.log('_msgEvent', _msgEvent)
   }
