@@ -14,6 +14,7 @@ NEJ.define([
   var _children // 0 - icon , 1 - title, 2 - [ delbtn ]
   var _userRequestUrl = window.NEJ_CONF.api + '/users'
   var _userTodoRequestUrl // <SERVER-PATH>/user/:userId/todo
+  var _userPersonalUrl // 个人链接
 
   _p._$$ModuleList = _klass._$klass()
   var _pro = _p._$$ModuleList._$extend(_module._$$ModuleAbstract)
@@ -25,7 +26,7 @@ NEJ.define([
     this.__data = [] // todo list <item: todo data>
     this.__list = [] // todo list <item: m-item module>
     this.__body = _element._$html2node(_tpl._$getTextTemplate('m-todo'))
-    _children = this.__body.children
+    _children = this.__body.children[0].children
 
     // 获取用户 todo 数据 or 注册用户
     var self = this
@@ -36,12 +37,6 @@ NEJ.define([
       })
     })
     
-    // 读取数据 & 初始化 todo list
-    // var _todosInStorage = _storage._$getDataInStorageWithDefault('todos', [])
-    // var _todosArr = this.__todos = _todosInStorage.map(function(todoId) { return _storage._$getDataInStorage('todo-' + todoId) })
-    // var _todosArr = this._getUserTodoList()
-    // this._getUserTodoList(this._initTodoList.bind(this)) 
-    
   }
 
   _pro.__onShow = function(_options) {
@@ -49,6 +44,7 @@ NEJ.define([
     var self = this
     var el_icon = _children[0]
     var el_input =_children[1]
+    var el_copyer = _children[2]
     
     _event._$addEvent(el_input, 'enter', function(_actionEvent) {
       // 新增 todo
@@ -159,11 +155,12 @@ NEJ.define([
         // 请求正常回调
         userId = _data.result.id
         _userTodoRequestUrl = _userRequestUrl + '/' + userId + '/todos'
-        self.__doSendMessage('/?/tip', {
-          status: 'OK',
-          id: userId
-        })
+        _userPersonalUrl = location.href.split('?')[0] + '?id=' + userId
+        // 更新 url
+        history.replaceState(null, null, '?id=' + userId)
+        // 将 user id 存入本地 localstorage
         _storage._$setDataInStorage('user-id', userId)
+        // 显示 todo list
         _element._$setStyle(self.__body, 'visibility', 'visible')
         callback(_data)
       },

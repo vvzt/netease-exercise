@@ -3,6 +3,6 @@ const users = require('../controller/users')
 
 router.prefix('/users')
 
-router.get('/', users.register)
+router.get('/', users.checkToken)
 
 module.exports = router

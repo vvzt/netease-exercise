@@ -1,11 +1,11 @@
 const TodosModel = require('../model/todos')
 const UsersModel = require('../model/users')
 
-const wait = async (s) => {
-  return new Promise(res => {
-    setTimeout(() => res(), s*1000);
-  })
-}
+// const wait = async (s) => {
+//   return new Promise(res => {
+//     setTimeout(() => res(), s*1000);
+//   })
+// }
 
 module.exports = {
 

@@ -1,15 +1,15 @@
 const UsersModel = require('../model/users')
 
-const wait = async (s) => {
-  return new Promise(res => {
-    setTimeout(() => res(), s*1000);
-  })
-}
+// const wait = async (s) => {
+//   return new Promise(res => {
+//     setTimeout(() => res(), s*1000);
+//   })
+// }
 
 module.exports = {
 
-  async register(ctx) {
-    await wait(1)
+  async checkToken(ctx) {
+    // await wait(1)
     let id = ctx.request.query.id
     try {
       let findRes
