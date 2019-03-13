@@ -8,7 +8,6 @@ router.param('userId', async (id, ctx, next) => {
   try {
     let user = await UsersModel.findById(id)
     if(!user) return ctx.status = 404
-    console.log(123, user)
     return next()
   } catch(err) {
     ctx.status = 500
