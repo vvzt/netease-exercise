@@ -37,11 +37,10 @@ NEJ.define([
     var _containerTemplate = _tpl._$getTextTemplate('m-container')
     this.__body = _element._$html2node(_containerTemplate)
 
-    var children = this.__body.children // 1 - banner, 2 - todo, 0 - tip
+    var children = this.__body.children // 0 - banner, 1 - todo
     this.__export = {
-      banner: children[1],
-      tip: children[0],
-      parent: children[2],
+      banner: children[0],
+      parent: children[1],
     }
   }
 

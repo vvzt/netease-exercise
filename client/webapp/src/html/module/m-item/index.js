@@ -78,7 +78,6 @@ NEJ.define([
         }
         case this.__ndel: {
           // del
-          var _id = this.__data.id
           this._$dispatchEvent('onbeforecycle', this)
           this._$recycle()
           break
@@ -97,34 +96,8 @@ NEJ.define([
     }
   }
 
-  _pro._delTodoItemInStorage = function(_id) {
-    // 删除 todo item 后更新数据
-    var _idIndex
-    var todos = _storage._$getDataInStorage('todos')
-    // 更新 localstorage todos
-    
-    // es6
-    // _idIndex = todos.findIndex(id => id === _id)
-
-    // todos.forEach(function(id, i) {
-    //   if(id === _id) _idIndex = i
-    // })
-    // if(_idIndex > -1) todos.splice(_idIndex, 1)
-    
-    for(var i = 0; i < todos.length; i++) {
-      if(todos[i] === _id) {
-        todos.splice(i, 1)
-        break
-      }
-    }
-
-    _storage._$delDataInStorage('todo-' + _id)
-    _storage._$setDataInStorage('todos', todos)
-  }
-
   _pro._$updateTodoItem = function(_data) {
     // 当 icon 被点击时 (event: ontoggle) 触发
-    // _storage._$setDataInStorage('todo-' + _data.id, _data)
     this.__doRefresh(_data)
   }
 

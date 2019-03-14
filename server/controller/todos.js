@@ -14,18 +14,16 @@ module.exports = {
     let userId = ctx.params.userId
     try {
       // 查找 userId 的所有 todos 并以时间排序
-      await TodosModel.find({ author: userId }, null, { sort: { 'date': 1 } }, function(err, res) {
-        if(err) console.log('ERROR: ' + err)
-        else ctx.body = {
-          status: 'OK',
-          result: res.map(row => ({
-            id: row._id,
-            date: row.date,
-            completed: row.completed,
-            title: row.title,
-          })),
-        }
-      })
+      const result = await TodosModel.find({ author: userId }, null, { sort: { 'date': 1 } }).exec()
+      ctx.body = {
+        status: 'OK',
+        result: result.map(row => ({
+          id: row._id,
+          date: row.date,
+          completed: row.completed,
+          title: row.title,
+        })),
+      }
     } catch(err) {
       ctx.status = 500
       ctx.body = {
@@ -68,16 +66,10 @@ module.exports = {
     // await wait(1)
     let requestParams = ctx.params
     try {
-      await TodosModel.findByIdAndDelete(requestParams.id, function(err, res) {
-        if(err) console.log('ERROR: ' + err)
-        else if(res === null) {
-          ctx.status = 404
-        } else {
-          ctx.body = {
-            status: 'OK'
-          }
-        }
-      })
+      let result = await TodosModel.findByIdAndDelete(requestParams.id).exec()
+      ctx.body = {
+        status: 'OK'
+      }
     } catch(err) {
       ctx.status = 500
       ctx.body = {
@@ -93,28 +85,21 @@ module.exports = {
     let requestBody = ctx.request.body
     let completed = requestBody.completed || false
     try {
-      await TodosModel.findByIdAndUpdate(requestParams.id, {
-        completed: completed,
-      }, function (err, res) {
-        if(err) console.log('ERROR: ' + err)
-        else if(res === null) {
-          ctx.status = 404
-        } else {
-          ctx.body = {
-            status: 'OK',
-            result: {
-              id: res._id,
-              completed: completed,
-            },
-          }
-        }
-      })
+      let result = await TodosModel.findByIdAndUpdate(requestParams.id, { completed: completed }).exec()
+      ctx.body = {
+        status: 'OK',
+        result: {
+          id: result._id,
+          completed: completed,
+        },
+      }
     } catch(err) {
       ctx.status = 500
       ctx.body = {
         status: 'Error',
         // result: err,
       }
+      console.log(err)
     }
   },
 
@@ -124,15 +109,11 @@ module.exports = {
     let requestBody = ctx.request.body
     let completed = requestBody.completed || false
     try {
-      await TodosModel.updateMany({ author: requestParams.userId }, { completed: completed }, function(err, res) {
-        if(err) console.log('ERROR: ' + err)
-        else {
-          ctx.body = {
-            status: 'OK',
-            result: res
-          }
-        }
-      })
+      let result = await TodosModel.updateMany({ author: requestParams.userId }, { completed: completed }).exec()
+      ctx.body = {
+        status: 'OK',
+        result: result
+      }
     } catch(err) {
       ctx.status = 500
       ctx.body = {

@@ -8,8 +8,7 @@ NEJ.define([
   'util/cache/storage',
   'util/ajax/rest',
   '../m-item/index.js',
-  '../m-tip/index.js',
-], function(_klass, _element, _event, _module, _tpl, _jst, _storage, _ajax, _mlist, _mtip, _p) {
+], function(_klass, _element, _event, _module, _tpl, _jst, _storage, _ajax, _mlist, _p) {
   var _todoItemConfObj
   var _children // 0 - icon , 1 - title, 2 - [ delbtn ]
   var _userRequestUrl = window.NEJ_CONF.api + '/users'
@@ -28,7 +27,7 @@ NEJ.define([
     this.__body = _element._$html2node(_tpl._$getTextTemplate('m-todo'))
     _children = this.__body.children[0].children
 
-    // 获取用户 todo 数据 or 注册用户
+    // 获取用户 todo list
     var self = this
     self._checkUserToken(function() {
       self._getUserTodoList(function(data) {
@@ -44,8 +43,8 @@ NEJ.define([
     var self = this
     var el_icon = _children[0]
     var el_input =_children[1]
-    var el_copyer = _children[2]
     
+    // 输入 新增 todo item
     _event._$addEvent(el_input, 'enter', function(_actionEvent) {
       // 新增 todo
       if(this.value.length === 0) return
@@ -58,6 +57,7 @@ NEJ.define([
       this.value = ''
     }, false)
 
+    // 全选
     _event._$addEvent(el_icon, 'click', function(_actionEvent) {
       // 修改 icon 状态
       var _isAllCompleted = !self.__isAllCompleted
@@ -81,9 +81,9 @@ NEJ.define([
   _pro.__onRefresh = function(_data) {
     this.__super(_data)
     if(_data.todo) {
-      // add
+      // 新增 todo item
       this.__list.push(_tpl._$getItemTemplate([ _data.todo ], _mlist._$$ModuleItem, _todoItemConfObj)[0])
-      this._setIconClass(_children[0], this.__isAllCompleted = false)
+      this._setIconClass(el_icon, this.__isAllCompleted = false)
     }
   }
 
@@ -116,8 +116,8 @@ NEJ.define([
         // self.__list.forEach(function(item, i) {
         //   if(item === _item) self.__list.splice(i, 1)
         // })
-        console.log(_item)
-        self._delUserTodoItem(_item.__id, function() {
+        // console.log(_item)
+        self._delUserTodoItem(_item.__data.id, function() {
           for(var i = 0; i < self.__list.length; i++) {
             if(self.__list[i] === _item) {
               self.__list.splice(i, 1)
@@ -128,7 +128,8 @@ NEJ.define([
         })
       },
       ontoggle: function(_item) {
-        self._modUserTodoItem(_item.__id, _item.completed, function() {
+        console.log(_item)
+        self._modUserTodoItem(_item.__data.id, _item.__data.completed, function() {
           self._checkAllCompletedStatus()
         })
       }
@@ -141,11 +142,12 @@ NEJ.define([
   }
 
   _pro._checkUserToken = function(callback) {
+    // 验证用户
     // _event._$addEvent(window, 'resterror', function(_error) {
     //   console.log(_error)
     // })
     var self = this
-    var userId = _storage._$getDataInStorage('user-id')
+    var userId = location.parse(location.href).query.id || _storage._$getDataInStorage('user-id')
     var requestParam = userId ? { id: userId } : {}
     _ajax._$request(_userRequestUrl, {
       // sync: true,
@@ -161,13 +163,14 @@ NEJ.define([
         // 将 user id 存入本地 localstorage
         _storage._$setDataInStorage('user-id', userId)
         // 显示 todo list
-        _element._$setStyle(self.__body, 'visibility', 'visible')
+        _element._$setStyle(self.__body, 'display', 'block')
         callback(_data)
       },
       onerror: function(_error) {
-        self.__doSendMessage('/?/tip', {
-          status: 'error'
-        })
+        // 错误提示
+        self.__body.innerHTML = 'Your ID check failed... Retry it, please.'
+        self.__body.className = 'z-error'
+        // console.log(_error)
       },
     })
   }

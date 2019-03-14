@@ -6,12 +6,12 @@ router.prefix('/users/:userId/todos')
 
 router.param('userId', async (id, ctx, next) => {
   try {
-    let user = await UsersModel.findById(id)
-    if(!user) return ctx.status = 404
-    return next()
+    let userInfo = await UsersModel.findById(id).exec()
+    return userInfo ? next() : ctx.status = 404
   } catch(err) {
     ctx.status = 500
-    ctx.body = err ? err : 'Something error'
+    // ctx.body = err ? err : 'Something error'
+    ctx.body = 'error'
   }
 })
 

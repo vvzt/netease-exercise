@@ -17,10 +17,11 @@ module.exports = {
         // 有 query id 时查询用户是否存在
         await UsersModel.findById(id, function(err, res) {
           if(err) {
+            ctx.status = 500
             findRes = err
             console.log('ERROR: ' + err)
           }
-          else if(!res) {
+          else if(err && !res) {
             findRes = 404
             ctx.body = {
               status: 'Error',
