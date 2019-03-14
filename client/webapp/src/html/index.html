@@ -36,15 +36,18 @@
             'layout-app': '/todo',
             'todo-list': '/todo/list',
             'todo-banner': '/?/banner',
+            'todo-footer': '/?/footer',
           }
         },
         modules: {
           '/?/banner': 'module/m-banner/index.html',
+          '/?/footer': 'module/m-footer/index.html',
 
           '/todo': {
             module: 'module/m-layout/index.html',
             composite: {
               banner: '/?/banner',
+              footer: '/?/footer',
             }
           },
           '/todo/list': 'module/m-list/index.html',

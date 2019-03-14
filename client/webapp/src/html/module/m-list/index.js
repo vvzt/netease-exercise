@@ -83,7 +83,7 @@ NEJ.define([
     if(_data.todo) {
       // 新增 todo item
       this.__list.push(_tpl._$getItemTemplate([ _data.todo ], _mlist._$$ModuleItem, _todoItemConfObj)[0])
-      this._setIconClass(el_icon, this.__isAllCompleted = false)
+      this._setIconClass(_children[0], this.__isAllCompleted = false)
     }
   }
 
@@ -164,6 +164,8 @@ NEJ.define([
         _storage._$setDataInStorage('user-id', userId)
         // 显示 todo list
         _element._$setStyle(self.__body, 'display', 'block')
+        // footer 链接提示
+        self.__doSendMessage('/?/footer', { url: _userPersonalUrl })
         callback(_data)
       },
       onerror: function(_error) {

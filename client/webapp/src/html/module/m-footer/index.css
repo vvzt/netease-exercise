@@ -1,11 +1,10 @@
-.g-banner {
-  height: 80px;
+.g-footer {
+  height: 40px;
+  padding: 10px;
   text-align: center;
 }
 
-.s-banner {
+.s-footer {
   font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-  font-size: 80px;
-  line-height: 80px;
-  color: rgba(178, 0, 0, 0.3);
+  color: rgba(178, 0, 0, 0.5)
 }

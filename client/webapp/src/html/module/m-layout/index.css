@@ -1,0 +1,11 @@
+/* .g-container {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: space-between;
+  height: 100%;
+} */
+
+.m-banner, .m-todo, .m-footer {
+  position: relative;
+  z-index: 1;
+}
