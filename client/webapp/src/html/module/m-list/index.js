@@ -170,8 +170,8 @@ NEJ.define([
       },
       onerror: function(_error) {
         // 错误提示
-        self.__body.innerHTML = 'Your ID check failed... Retry it, please.'
         self.__body.className = 'z-error'
+        self.__body.innerHTML = 'Your ID check failed... Retry it, please.'
         // console.log(_error)
       },
     })
