@@ -16,12 +16,12 @@
   <!-- @SCRIPT -->
   <script src="../javascript/lib/nej/define.js"></script>
   <script>
-    window.NEJ_CONF = {
-      api: 'http://localhost:3000'
-    }
     NEJ.define([
       'util/dispatcher/dispatcher'
     ], function(_dispatcher) {
+      window.NEJ_CONF = {
+        api: 'http://localhost:3000'
+      }
       _dispatcher._$startup({
         rules: {
           rewrite: {

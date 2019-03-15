@@ -15,14 +15,16 @@ module.exports = {
     try {
       // 查找 userId 的所有 todos 并以时间排序
       const result = await TodosModel.find({ author: userId }, null, { sort: { 'date': 1 } }).exec()
-      ctx.body = {
-        status: 'OK',
-        result: result.map(row => ({
-          id: row._id,
-          date: row.date,
-          completed: row.completed,
-          title: row.title,
-        })),
+      if(result) {
+        ctx.body = {
+          status: 'OK',
+          result: result.map(row => ({
+            id: row._id,
+            date: row.date,
+            completed: row.completed,
+            title: row.title,
+          })),
+        }
       }
     } catch(err) {
       ctx.status = 500
@@ -66,9 +68,11 @@ module.exports = {
     // await wait(1)
     let requestParams = ctx.params
     try {
-      let result = await TodosModel.findByIdAndDelete(requestParams.id).exec()
-      ctx.body = {
-        status: 'OK'
+      const result = await TodosModel.findByIdAndDelete(requestParams.id).exec()
+      if(result) {
+        ctx.body = {
+          status: 'OK'
+        }
       }
     } catch(err) {
       ctx.status = 500
@@ -85,13 +89,15 @@ module.exports = {
     let requestBody = ctx.request.body
     let completed = requestBody.completed || false
     try {
-      let result = await TodosModel.findByIdAndUpdate(requestParams.id, { completed: completed }).exec()
-      ctx.body = {
-        status: 'OK',
-        result: {
-          id: result._id,
-          completed: completed,
-        },
+      const result = await TodosModel.findByIdAndUpdate(requestParams.id, { completed: completed }).exec()
+      if(result) {
+        ctx.body = {
+          status: 'OK',
+          result: {
+            id: result._id,
+            completed: completed,
+          },
+        }
       }
     } catch(err) {
       ctx.status = 500
@@ -109,10 +115,12 @@ module.exports = {
     let requestBody = ctx.request.body
     let completed = requestBody.completed || false
     try {
-      let result = await TodosModel.updateMany({ author: requestParams.userId }, { completed: completed }).exec()
-      ctx.body = {
-        status: 'OK',
-        result: result
+      const result = await TodosModel.updateMany({ author: requestParams.userId }, { completed: completed }).exec()
+      if(result) {
+        ctx.body = {
+          status: 'OK',
+          result: result
+        }
       }
     } catch(err) {
       ctx.status = 500
