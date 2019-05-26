@@ -1,4 +1,4 @@
-# netease-exercise
+# todo-list
 
 用 NEJ 开发一个简单的 todo 应用，分为 本地版本 ***./client-local*** 和 线上版本 ***./client*** & ***./server***，线上版本后端基于 **Koa2**。
 
